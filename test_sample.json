@@ -1,0 +1,158 @@
+{
+  "timelineObjects": [
+    {
+      "activitySegment": {
+        "startLocation": {
+          "latitudeE7": 356812000,
+          "longitudeE7": 1397671000
+        },
+        "endLocation": {
+          "latitudeE7": 356950000,
+          "longitudeE7": 1397520000
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T09:00:00Z",
+          "endTimestamp": "2024-01-15T09:30:00Z"
+        },
+        "distance": 2500,
+        "activityType": "WALKING",
+        "confidence": "HIGH",
+        "waypointPath": {
+          "waypoints": [
+            {"latE7": 356830000, "lngE7": 1397650000},
+            {"latE7": 356860000, "lngE7": 1397610000},
+            {"latE7": 356900000, "lngE7": 1397560000}
+          ]
+        }
+      }
+    },
+    {
+      "placeVisit": {
+        "location": {
+          "latitudeE7": 356950000,
+          "longitudeE7": 1397520000,
+          "name": "新宿駅",
+          "address": "東京都新宿区新宿三丁目",
+          "placeId": "ChIJ6-LQkweMGGARvRkMFFBjIR8"
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T09:30:00Z",
+          "endTimestamp": "2024-01-15T10:00:00Z"
+        },
+        "placeConfidence": "HIGH"
+      }
+    },
+    {
+      "activitySegment": {
+        "startLocation": {
+          "latitudeE7": 356950000,
+          "longitudeE7": 1397520000
+        },
+        "endLocation": {
+          "latitudeE7": 357100000,
+          "longitudeE7": 1396500000
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T10:00:00Z",
+          "endTimestamp": "2024-01-15T10:45:00Z"
+        },
+        "distance": 15000,
+        "activityType": "IN_TRAIN",
+        "confidence": "HIGH",
+        "waypointPath": {
+          "waypoints": [
+            {"latE7": 356980000, "lngE7": 1397400000},
+            {"latE7": 357020000, "lngE7": 1397200000},
+            {"latE7": 357050000, "lngE7": 1397000000},
+            {"latE7": 357080000, "lngE7": 1396700000}
+          ]
+        }
+      }
+    },
+    {
+      "placeVisit": {
+        "location": {
+          "latitudeE7": 357100000,
+          "longitudeE7": 1396500000,
+          "name": "渋谷スクランブルスクエア",
+          "address": "東京都渋谷区渋谷二丁目"
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T10:45:00Z",
+          "endTimestamp": "2024-01-15T12:30:00Z"
+        }
+      }
+    },
+    {
+      "activitySegment": {
+        "startLocation": {
+          "latitudeE7": 357100000,
+          "longitudeE7": 1396500000
+        },
+        "endLocation": {
+          "latitudeE7": 356812000,
+          "longitudeE7": 1397671000
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T12:30:00Z",
+          "endTimestamp": "2024-01-15T13:10:00Z"
+        },
+        "distance": 8000,
+        "activityType": "IN_PASSENGER_VEHICLE",
+        "waypointPath": {
+          "waypoints": [
+            {"latE7": 357050000, "lngE7": 1396700000},
+            {"latE7": 356950000, "lngE7": 1397100000},
+            {"latE7": 356880000, "lngE7": 1397400000}
+          ]
+        }
+      }
+    },
+    {
+      "placeVisit": {
+        "location": {
+          "latitudeE7": 356812000,
+          "longitudeE7": 1397671000,
+          "name": "東京駅",
+          "address": "東京都千代田区丸の内"
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T13:10:00Z",
+          "endTimestamp": "2024-01-15T14:00:00Z"
+        }
+      }
+    },
+    {
+      "activitySegment": {
+        "startLocation": {
+          "latitudeE7": 356812000,
+          "longitudeE7": 1397671000
+        },
+        "endLocation": {
+          "latitudeE7": 356750000,
+          "longitudeE7": 1397800000
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T14:00:00Z",
+          "endTimestamp": "2024-01-15T14:15:00Z"
+        },
+        "distance": 1200,
+        "activityType": "CYCLING"
+      }
+    },
+    {
+      "placeVisit": {
+        "location": {
+          "latitudeE7": 356750000,
+          "longitudeE7": 1397800000,
+          "name": "銀座四丁目交差点",
+          "address": "東京都中央区銀座"
+        },
+        "duration": {
+          "startTimestamp": "2024-01-15T14:15:00Z",
+          "endTimestamp": "2024-01-15T16:00:00Z"
+        }
+      }
+    }
+  ]
+}

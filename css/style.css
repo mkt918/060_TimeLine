@@ -1,0 +1,244 @@
+/* style.css - Timeline Analyzer カスタムスタイル */
+
+/* ===== ベースリセット ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ===== 地図 ===== */
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== ヘッダーアイコン ===== */
+.header-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border-radius: 10px;
+}
+
+/* ===== インポートボタン ===== */
+.import-button {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+}
+.import-button:hover {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ===== ドロップゾーン ===== */
+.drop-zone {
+  transition: all 0.3s ease;
+}
+.drop-zone.drag-over {
+  border-color: #6366f1;
+  background: #eef2ff;
+  transform: scale(1.01);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+}
+
+/* ===== サイドパネル ===== */
+.sidebar-panel {
+  transition: all 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+.sidebar-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-panel::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+.sidebar-panel::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* ===== 統計カード ===== */
+.stat-card {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #c7d2fe;
+}
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ===== 移動手段行 ===== */
+.activity-row {
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+.activity-row:hover {
+  background: #f8fafc;
+}
+
+/* ===== 場所行 ===== */
+.place-row {
+  transition: all 0.2s;
+}
+.place-row:hover {
+  background: #f8fafc;
+}
+
+/* ===== カスタムマーカー ===== */
+.custom-marker {
+  background: none;
+  border: none;
+}
+.marker-pin {
+  width: 12px;
+  height: 12px;
+  background: #6366f1;
+  border: 2.5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+  transition: transform 0.2s;
+}
+.marker-pin:hover {
+  transform: scale(1.3);
+}
+
+/* ===== Leaflet ポップアップ ===== */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid #f1f5f9;
+}
+.leaflet-popup-content {
+  margin: 12px 16px !important;
+  font-family: 'Inter', 'Noto Sans JP', sans-serif !important;
+}
+.popup-content {
+  min-width: 160px;
+}
+
+/* ===== ローディングスピナー ===== */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== トースト通知 ===== */
+.toast {
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateX(120%);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 400px;
+}
+.toast.show {
+  transform: translateX(0);
+}
+.toast-success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.toast-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+.toast-info {
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+/* ===== セクションタイトル ===== */
+.section-title {
+  position: relative;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, transparent);
+  border-radius: 2px;
+}
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 768px) {
+  #sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 340px;
+    z-index: 40;
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.1);
+  }
+  #filter-panel {
+    left: 8px !important;
+    right: 8px !important;
+  }
+  #filter-panel .flex {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* ===== フェードインアニメーション ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stat-card,
+.activity-row,
+.place-row {
+  animation: fadeIn 0.4s ease both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-card:nth-child(4) { animation-delay: 0.2s; }
