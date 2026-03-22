@@ -380,6 +380,51 @@ const App = (() => {
     `).join('');
   }
 
+  // --- データリスト表示 ---
+  function renderDataList(data) {
+    const listEl = document.getElementById('data-list'); // データリストを表示する要素
+    if (!listEl) return;
+
+    // 場所と移動を結合し、時間順にソート
+    const combinedList = [
+      ...data.places.map(p => ({ ...p, type: 'place' })),
+      ...data.activities.map(a => ({ ...a, type: 'activity' }))
+    ].sort((a, b) => a.startDate - b.startDate);
+
+    let html = '';
+    for (const item of combinedList) {
+      if (item.type === 'place') {
+        html += `
+          <div class="list-item place-item p-3 mb-2 bg-white rounded-xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-all cursor-pointer" 
+               onclick="TimelineMap.panTo(${item.lat}, ${item.lng})">
+            <div class="flex justify-between items-start mb-1">
+              <span class="text-[10px] font-bold px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded uppercase tracking-wider">📍 滞在</span>
+              <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">${formatDuration(item.durationMs)}</span>
+            </div>
+            <div class="text-sm font-bold text-gray-800 mb-1">${Utils.escapeHtml(item.name)}</div>
+            <div class="flex items-center gap-2 text-[10px] text-gray-400">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>${formatTime(item.startDate)} - ${formatTime(item.endDate)}</span>
+            </div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="list-item activity-item p-2 mb-2 bg-gray-50/50 rounded-lg border-l-4 border-transparent hover:bg-gray-100 transition-all cursor-pointer opacity-80"
+               style="border-left-color: ${item.color}">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-2 h-2 rounded-full" style="background: ${item.color}"></span>
+              <span class="text-[10px] font-bold text-gray-500">${item.label}</span>
+              <span class="text-[10px] text-gray-400">${formatDistance(item.distance)} · ${formatDuration(item.durationMs)}</span>
+            </div>
+            <div class="text-xs font-medium text-gray-600 truncate">${Utils.escapeHtml(item.name)}</div>
+          </div>
+        `;
+      }
+    }
+    listEl.innerHTML = html;
+  }
+
   function showError(msg) {
     showToast(msg, 'error');
   }

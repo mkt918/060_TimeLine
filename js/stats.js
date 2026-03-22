@@ -43,7 +43,7 @@ const TimelineStats = (() => {
       placeCount[name].totalDurationMs += p.durationMs || 0;
     }
     const topPlaces = Object.values(placeCount)
-      .sort((a, b) => b.count - a.count)
+      .sort((a, b) => b.totalDurationMs - a.totalDurationMs)
       .slice(0, 10);
 
     // 日別の集計
@@ -190,8 +190,8 @@ const TimelineStats = (() => {
              title="${escapeAttr(p.name)}">
           <span class="text-xs font-bold text-gray-400 w-5">${i + 1}</span>
           <div class="flex-1 min-w-0">
-            <div class="text-sm truncate">${escapeHtml(p.name)}</div>
-            <div class="text-xs text-gray-500">${p.count}回 · ${formatDurationShort(p.totalDurationMs)}</div>
+            <div class="text-sm truncate font-medium text-gray-800">${escapeHtml(p.name)}</div>
+            <div class="text-xs text-gray-500"><span class="font-bold text-blue-600">${formatDurationShort(p.totalDurationMs)}</span> · ${p.count}回訪問</div>
           </div>
         </div>
       `;
