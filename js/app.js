@@ -9,8 +9,8 @@ const App = (() => {
   let originalDateRange = { min: null, max: null }; // 全データの日付範囲を保持
   let dateFilter = { start: null, end: null };
   let durationThreshold = 5; // 滞在時間の閾値（分）
-  let excludeHomeWork = true; // 自宅・仕事(タグ)を除外するか
-  let exclusionPoints = []; // 座標ベースの除外地点 [{lat, lng, radius}]
+  let excludeTags = true; // タグベースの除外
+  let exclusionMaster = []; // 地点マスタ [{id, name, lat, lng, radius}]
 
   /**
    * アプリ初期化
@@ -82,21 +82,38 @@ const App = (() => {
         const startInput = document.getElementById('filter-start');
         const endInput = document.getElementById('filter-end');
         const durInput = document.getElementById('filter-duration');
-        const hwInput = document.getElementById('exclude-home-work');
+        const tagInput = document.getElementById('exclude-tags');
 
         dateFilter.start = startInput?.value ? new Date(startInput.value + 'T00:00:00') : null;
         dateFilter.end = endInput?.value ? new Date(endInput.value + 'T23:59:59') : null;
         durationThreshold = parseInt(durInput?.value || '0');
-        excludeHomeWork = hwInput?.checked || false;
-
-        // 座標ベースの除外地点を更新
-        exclusionPoints = [];
-        const homeCoords = parseCoordsInput(document.getElementById('home-coords')?.value);
-        const workCoords = parseCoordsInput(document.getElementById('work-coords')?.value);
-        if (homeCoords) exclusionPoints.push({ ...homeCoords, radius: 500 });
-        if (workCoords) exclusionPoints.push({ ...workCoords, radius: 500 });
+        excludeTags = tagInput?.checked || false;
 
         applyFilter();
+      });
+    }
+
+    // マスタ追加イベント
+    const addMasterBtn = document.getElementById('add-master-point');
+    if (addMasterBtn) {
+      addMasterBtn.addEventListener('click', () => {
+        const nameInput = document.getElementById('master-name');
+        const coordsInput = document.getElementById('master-coords');
+        const radiusInput = document.getElementById('master-radius');
+        
+        const coords = parseCoordsInput(coordsInput?.value);
+        if (coords) {
+          addMasterPoint({
+            name: nameInput?.value || '地点',
+            lat: coords.lat,
+            lng: coords.lng,
+            radius: parseInt(radiusInput?.value || '500')
+          });
+          nameInput.value = '';
+          coordsInput.value = '';
+        } else {
+          showError('座標の形式が正しくありません（例: 35.1,136.9）');
+        }
       });
     }
 
@@ -204,6 +221,10 @@ const App = (() => {
     currentStats = TimelineStats.calculate(data);
     TimelineStats.render(currentStats);
 
+    // マスタ読み込み
+    loadMaster();
+    renderMasterList();
+
     // 日付フィルターの範囲設定（全データの範囲を保持し、フィルター時も変えない）
     if (currentStats.minDate && currentStats.maxDate && !originalDateRange.min) {
       originalDateRange.min = currentStats.minDate;
@@ -227,7 +248,7 @@ const App = (() => {
   function applyFilter() {
     if (!currentData) return;
 
-    if (dateFilter.start || dateFilter.end || durationThreshold > 0 || excludeHomeWork) {
+    if (dateFilter.start || dateFilter.end || durationThreshold > 0 || excludeTags || exclusionMaster.length > 0) {
           // 滞在の判定・フィルタリング
     const filteredPlaces = currentData.places.filter(p => {
       // 日付フィルター
@@ -238,12 +259,12 @@ const App = (() => {
       const durationMin = p.durationMs / 60000;
       if (durationMin < durationThreshold) return false;
 
-      // 自宅・仕事フィルター (タグベース)
-      if (excludeHomeWork && (p.semanticType === 'HOME' || p.semanticType === 'WORK')) return false;
+      // タグフィルター
+      if (excludeTags && (p.semanticType === 'HOME' || p.semanticType === 'WORK')) return false;
 
-      // 座標ベースの除外 (半径500m)
-      for (const ep of exclusionPoints) {
-        if (TimelineParser.haversineDistance(p.lat, p.lng, ep.lat, ep.lng) < ep.radius) {
+      // マスタ座標フィルター
+      for (const m of exclusionMaster) {
+        if (TimelineParser.haversineDistance(p.lat, p.lng, m.lat, m.lng) < m.radius) {
           return false;
         }
       }
@@ -257,13 +278,13 @@ const App = (() => {
       if (dateFilter.start && a.startDate < dateFilter.start) return false;
       if (dateFilter.end && a.endDate > dateFilter.end) return false;
 
-      // 座標ベースの除外 (開始点または終了点が半径500m以内なら除外)
-      for (const ep of exclusionPoints) {
+      // 座標ベースの除外 (開始点または終了点が半径内なら除外)
+      for (const m of exclusionMaster) {
         if (a.startLat !== null && a.startLng !== null) {
-          if (TimelineParser.haversineDistance(a.startLat, a.startLng, ep.lat, ep.lng) < ep.radius) return false;
+          if (TimelineParser.haversineDistance(a.startLat, a.startLng, m.lat, m.lng) < m.radius) return false;
         }
         if (a.endLat !== null && a.endLng !== null) {
-          if (TimelineParser.haversineDistance(a.endLat, a.endLng, ep.lat, ep.lng) < ep.radius) return false;
+          if (TimelineParser.haversineDistance(a.endLat, a.endLng, m.lat, m.lng) < m.radius) return false;
         }
       }
 
@@ -304,6 +325,59 @@ const App = (() => {
   function showWelcome() {
     const el = document.getElementById('welcome');
     if (el) el.classList.remove('hidden');
+  }
+
+  // --- マスタ管理 ---
+  function loadMaster() {
+    try {
+      const saved = localStorage.getItem('timeline_exclusion_master');
+      if (saved) {
+        exclusionMaster = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('マスタ読み込み失敗', e);
+    }
+  }
+
+  function saveMaster() {
+    localStorage.setItem('timeline_exclusion_master', JSON.stringify(exclusionMaster));
+  }
+
+  function addMasterPoint(point) {
+    const id = Date.now().toString();
+    exclusionMaster.push({ id, ...point });
+    saveMaster();
+    renderMasterList();
+    applyFilter();
+  }
+
+  window.removeMasterPoint = function(id) {
+    exclusionMaster = exclusionMaster.filter(m => m.id !== id);
+    saveMaster();
+    renderMasterList();
+    applyFilter();
+  };
+
+  function renderMasterList() {
+    const listEl = document.getElementById('master-list');
+    if (!listEl) return;
+    
+    if (exclusionMaster.length === 0) {
+      listEl.innerHTML = '<p class="text-[9px] text-gray-400 text-center py-2">登録地点なし</p>';
+      return;
+    }
+
+    listEl.innerHTML = exclusionMaster.map(m => `
+      <div class="flex items-center justify-between gap-1 p-1 bg-white rounded border border-gray-100 shadow-sm">
+        <div class="min-w-0 flex-1">
+          <div class="text-[10px] font-bold text-gray-700 truncate">${Utils.escapeHtml(m.name)}</div>
+          <div class="text-[8px] text-gray-400">${m.lat.toFixed(3)}, ${m.lng.toFixed(3)} (${m.radius}m)</div>
+        </div>
+        <button onclick="removeMasterPoint('${m.id}')" class="text-gray-300 hover:text-red-500 transition-colors p-1">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    `).join('');
   }
 
   function showError(msg) {

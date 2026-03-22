@@ -127,23 +127,30 @@
             </div>
             <div class="flex flex-col gap-2 mt-1">
               <label class="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" id="exclude-home-work" checked class="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <input type="checkbox" id="exclude-tags" checked class="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <span class="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">🏠 タグ(HOME/WORK)で除外</span>
               </label>
               
-              <div class="mt-2 p-2 bg-gray-50 rounded-lg border border-gray-100 space-y-2">
-                <p class="text-[10px] font-bold text-gray-400">📍 特定地点から500m以内を除外</p>
-                <div class="space-y-1">
-                  <div class="flex items-center gap-1">
-                    <span class="text-[10px] w-8 text-gray-500">自宅:</span>
-                    <input type="text" id="home-coords" placeholder="緯度,経度" class="flex-1 text-[10px] border border-gray-200 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400">
+              <!-- 除外先マスタ管理 -->
+              <div class="mt-2 p-3 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">📍 除外先マスタ</p>
+                
+                <!-- 地点追加フォーム -->
+                <div class="space-y-1".antigravity-ignore>
+                  <input type="text" id="master-name" placeholder="地点名 (例: 自宅)" class="w-full text-[10px] border border-gray-200 rounded px-2 py-1 focus:ring-1 focus:ring-blue-400 outline-none">
+                  <div class="flex gap-1">
+                    <input type="text" id="master-coords" placeholder="緯度,経度" class="flex-1 text-[10px] border border-gray-200 rounded px-2 py-1 focus:ring-1 focus:ring-blue-400 outline-none">
+                    <input type="number" id="master-radius" value="500" placeholder="半径(m)" class="w-16 text-[10px] border border-gray-200 rounded px-2 py-1 focus:ring-1 focus:ring-blue-400 outline-none">
                   </div>
-                  <div class="flex items-center gap-1">
-                    <span class="text-[10px] w-8 text-gray-500">職場:</span>
-                    <input type="text" id="work-coords" placeholder="緯度,経度" class="flex-1 text-[10px] border border-gray-200 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400">
-                  </div>
+                  <button id="add-master-point" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 rounded transition-colors">+ 地点を追加</button>
                 </div>
-                <p class="text-[9px] text-gray-400 leading-tight">注: 地図上の移動も含め、この地点の半径500m以内にあるデータがすべて非表示になります。</p>
+
+                <!-- 登録済みリスト -->
+                <div id="master-list" class="max-h-32 overflow-y-auto space-y-1 border-t border-gray-200 pt-2">
+                  <!-- JSで動的に追加 -->
+                </div>
+                
+                <p class="text-[9px] text-gray-400 leading-tight">現在の地点より半径内にある履歴を非表示にします。データはブラウザに保存されます。</p>
               </div>
             </div>
           </div>
