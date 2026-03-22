@@ -180,7 +180,7 @@ const TimelineParser = (() => {
         const loc = visit.location || {};
         const place = {
           type: 'place',
-          name: loc.name || loc.address || '不明な場所',
+          name: loc.name || loc.address || getActivityLabel(seg.activityType) || '不明な移動',
           placeId: loc.placeId || '',
           address: loc.address || '',
           lat: e7ToCoord(loc.latitudeE7),
@@ -269,7 +269,7 @@ const TimelineParser = (() => {
           const v = seg.visit;
           const place = {
             type: 'place',
-            name: v.topCandidate?.placeLocation?.name || v.topCandidate?.semanticType || '不明な場所',
+            name: v.topCandidate?.placeLocation?.name || getActivityLabel(v.topCandidate?.type) || v.topCandidate?.semanticType || '不明な場所',
             placeId: v.topCandidate?.placeId || '',
             address: v.topCandidate?.placeLocation?.address || '',
             lat: v.topCandidate?.placeLocation?.latLng?.latitude ?? null,
@@ -346,7 +346,7 @@ const TimelineParser = (() => {
         const coords = parseGeoString(v.topCandidate?.placeLocation);
         const place = {
           type: 'place',
-          name: v.topCandidate?.semanticType || '不明な場所',
+          name: v.topCandidate?.placeLocation?.name || v.topCandidate?.semanticType || (v.topCandidate?.placeID ? `場所(${v.topCandidate.placeID.substring(0,6)})` : '不明な場所'),
           placeId: v.topCandidate?.placeID || '',
           address: '', // この形式にはアドレスがない場合が多い
           lat: coords ? coords.lat : null,
@@ -517,5 +517,6 @@ const TimelineParser = (() => {
     getActivityLabel,
     getActivityColor,
     detectFormat,
+    haversineDistance,
   };
 })();

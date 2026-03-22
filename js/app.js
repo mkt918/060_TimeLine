@@ -9,7 +9,8 @@ const App = (() => {
   let originalDateRange = { min: null, max: null }; // 全データの日付範囲を保持
   let dateFilter = { start: null, end: null };
   let durationThreshold = 5; // 滞在時間の閾値（分）
-  let excludeHomeWork = true; // 自宅・仕事を除外するか
+  let excludeHomeWork = true; // 自宅・仕事(タグ)を除外するか
+  let exclusionPoints = []; // 座標ベースの除外地点 [{lat, lng, radius}]
 
   /**
    * アプリ初期化
@@ -88,8 +89,24 @@ const App = (() => {
         durationThreshold = parseInt(durInput?.value || '0');
         excludeHomeWork = hwInput?.checked || false;
 
+        // 座標ベースの除外地点を更新
+        exclusionPoints = [];
+        const homeCoords = parseCoordsInput(document.getElementById('home-coords')?.value);
+        const workCoords = parseCoordsInput(document.getElementById('work-coords')?.value);
+        if (homeCoords) exclusionPoints.push({ ...homeCoords, radius: 500 });
+        if (workCoords) exclusionPoints.push({ ...workCoords, radius: 500 });
+
         applyFilter();
       });
+    }
+
+    function parseCoordsInput(val) {
+      if (!val) return null;
+      const parts = val.split(/[,\s]+/).map(p => parseFloat(p.trim()));
+      if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return { lat: parts[0], lng: parts[1] };
+      }
+      return null;
     }
 
     const durInput = document.getElementById('filter-duration');
@@ -221,8 +238,15 @@ const App = (() => {
       const durationMin = p.durationMs / 60000;
       if (durationMin < durationThreshold) return false;
 
-      // 自宅・仕事フィルター
+      // 自宅・仕事フィルター (タグベース)
       if (excludeHomeWork && (p.semanticType === 'HOME' || p.semanticType === 'WORK')) return false;
+
+      // 座標ベースの除外 (半径500m)
+      for (const ep of exclusionPoints) {
+        if (TimelineParser.haversineDistance(p.lat, p.lng, ep.lat, ep.lng) < ep.radius) {
+          return false;
+        }
+      }
 
       return true;
     });
@@ -233,8 +257,16 @@ const App = (() => {
       if (dateFilter.start && a.startDate < dateFilter.start) return false;
       if (dateFilter.end && a.endDate > dateFilter.end) return false;
 
-      // 特定地点への移動を除外する場合（オプション、一旦場所に合わせてフィルタリング）
-      // ここでは日付範囲のみでフィルタリングを維持
+      // 座標ベースの除外 (開始点または終了点が半径500m以内なら除外)
+      for (const ep of exclusionPoints) {
+        if (a.startLat !== null && a.startLng !== null) {
+          if (TimelineParser.haversineDistance(a.startLat, a.startLng, ep.lat, ep.lng) < ep.radius) return false;
+        }
+        if (a.endLat !== null && a.endLng !== null) {
+          if (TimelineParser.haversineDistance(a.endLat, a.endLng, ep.lat, ep.lng) < ep.radius) return false;
+        }
+      }
+
       return true;
     });
 
