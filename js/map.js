@@ -17,6 +17,7 @@ const TimelineMap = (() => {
       center: [35.6812, 139.7671], // 東京駅デフォルト
       zoom: 12,
       zoomControl: true,
+      preferCanvas: true, // Canvasレンダラーを使用して高速化
     });
 
     // OpenStreetMapタイル

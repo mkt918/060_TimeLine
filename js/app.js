@@ -8,6 +8,8 @@ const App = (() => {
   let currentStats = null;
   let originalDateRange = { min: null, max: null }; // 全データの日付範囲を保持
   let dateFilter = { start: null, end: null };
+  let durationThreshold = 5; // 滞在時間の閾値（分）
+  let excludeHomeWork = true; // 自宅・仕事を除外するか
 
   /**
    * アプリ初期化
@@ -76,10 +78,25 @@ const App = (() => {
 
     if (filterBtn) {
       filterBtn.addEventListener('click', () => {
-        // 両方ローカル時間で統一（YYYY-MM-DD → ローカル00:00:00 / 23:59:59）
+        const startInput = document.getElementById('filter-start');
+        const endInput = document.getElementById('filter-end');
+        const durInput = document.getElementById('filter-duration');
+        const hwInput = document.getElementById('exclude-home-work');
+
         dateFilter.start = startInput?.value ? new Date(startInput.value + 'T00:00:00') : null;
         dateFilter.end = endInput?.value ? new Date(endInput.value + 'T23:59:59') : null;
+        durationThreshold = parseInt(durInput?.value || '0');
+        excludeHomeWork = hwInput?.checked || false;
+
         applyFilter();
+      });
+    }
+
+    const durInput = document.getElementById('filter-duration');
+    const durValueDisplay = document.getElementById('duration-value');
+    if (durInput && durValueDisplay) {
+      durInput.addEventListener('input', (e) => {
+        durValueDisplay.textContent = `${e.target.value}分〜`;
       });
     }
 
@@ -193,27 +210,42 @@ const App = (() => {
   function applyFilter() {
     if (!currentData) return;
 
-    let filtered;
-    if (dateFilter.start || dateFilter.end) {
-      filtered = {
-        activities: currentData.activities.filter(a => {
-          if (!a.startDate) return false;
-          if (dateFilter.start && a.startDate < dateFilter.start) return false;
-          if (dateFilter.end && a.startDate > dateFilter.end) return false;
-          return true;
-        }),
-        places: currentData.places.filter(p => {
-          if (!p.startDate) return false;
-          if (dateFilter.start && p.startDate < dateFilter.start) return false;
-          if (dateFilter.end && p.startDate > dateFilter.end) return false;
-          return true;
-        }),
-      };
-    } else {
-      filtered = currentData;
-    }
+    if (dateFilter.start || dateFilter.end || durationThreshold > 0 || excludeHomeWork) {
+          // 滞在の判定・フィルタリング
+    const filteredPlaces = currentData.places.filter(p => {
+      // 日付フィルター
+      if (dateFilter.start && p.startDate < dateFilter.start) return false;
+      if (dateFilter.end && p.endDate > dateFilter.end) return false;
 
-    renderData(filtered);
+      // 滞在時間フィルター
+      const durationMin = p.durationMs / 60000;
+      if (durationMin < durationThreshold) return false;
+
+      // 自宅・仕事フィルター
+      if (excludeHomeWork && (p.semanticType === 'HOME' || p.semanticType === 'WORK')) return false;
+
+      return true;
+    });
+
+    // 移動のフィルタリング
+    const filteredActivities = currentData.activities.filter(a => {
+      // 日付フィルター
+      if (dateFilter.start && a.startDate < dateFilter.start) return false;
+      if (dateFilter.end && a.endDate > dateFilter.end) return false;
+
+      // 特定地点への移動を除外する場合（オプション、一旦場所に合わせてフィルタリング）
+      // ここでは日付範囲のみでフィルタリングを維持
+      return true;
+    });
+
+    renderData({
+      activities: filteredActivities,
+      places: filteredPlaces,
+      format: currentData.format
+    });
+    } else {
+      renderData(currentData);
+    }
   }
 
   // --- UI ヘルパー ---
